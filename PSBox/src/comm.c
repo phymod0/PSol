@@ -64,7 +64,11 @@ static int fill_client_addr(struct sockaddr_in *client_addr) {
 	if_req.ifr_addr.sa_family = AF_INET;
 	strcpy(if_req.ifr_name, CLIENT_IFNAME);
 
-	ioctl(fd, SIOCGIFADDR, &if_req);
+	if (ioctl(fd, SIOCGIFADDR, &if_req) < 0) {
+		perror("ioctl(SIOCGIFADDR)");
+		close(fd);
+		return FAILURE;
+	}
 
 	close(fd);
 
@@ -93,8 +97,8 @@ int comm_send_data(char *buf, int len) {
 	struct sockaddr_in client_addr, server_addr;
 	socklen_t addr_len;
 
-	fill_server_addr(&server_addr);
-	fill_client_addr(&client_addr);
+	if (fill_server_addr(&server_addr) == FAILURE || fill_client_addr(&client_addr) == FAILURE)
+		return FAILURE;
 
 	addr_len = sizeof(struct sockaddr_in);
 
