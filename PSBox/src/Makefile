@@ -1,18 +1,15 @@
 
-CC = gcc
-LD = gcc
-
 LDFLAGS += -lnfnetlink -lnetfilter_queue
 
-SOURCE_FILES += $(wildcard *.c)
-C_OFILES = $(patsubst %.c,%.o,$(SOURCE_FILES))
+C_FILES += $(wildcard *.c)
+C_OFILES = $(patsubst %.c,%.o,$(C_FILES))
+PROGRAM = psbox
 
-psbox: $(C_OFILES)
-	$(LD) $(C_OFILES) -o psbox $(LDFLAGS)
-	rm $(C_OFILES)
+$(PROGRAM): $(C_OFILES)
+	$(CC) $(C_OFILES) -o psbox $(LDFLAGS)
 
 $(C_OFILES):
 	$(CC) $(CFLAGS) -c $(patsubst %.o,%.c,$@)
 
 clean:
-	rm psbox
+	rm $(C_OFILES) $(PROGRAM)
